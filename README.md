@@ -39,29 +39,31 @@ Ensure you have the following installed on your system:
    git clone https://github.com/your-username/healthcheck-app.git
    cd healthcheck-app 
    
-Install dependencies:
+2. Install dependencies:
+   
    ```bash
     npm install
-Run the application:
 
-bash
-Copy code
-npm start
+3. Run the application:
+   ```bash
+    npm start
+
 Access the app at http://localhost:3000.
 
-Usage
+## Usage
 Open http://localhost:3000 in your browser.
 Register or log in.
 Use the HealthCheck form to enter name, age, and symptoms.
 Get enhanced suggestions for health conditions.
 View and manage your health check history.
-API Documentation
+
+## API Documentation
 Explore the API at http://localhost:3000/api-docs for endpoint details.
 
-Contributing
+## Contributing
 Contributions welcome! Follow Contributing Guidelines.
 
-License
+## License
 MIT License
 
 csharp
