@@ -65,7 +65,3 @@ Contributions welcome! Follow Contributing Guidelines.
 
 ## License
 MIT License
-
-csharp
-Copy code
-
