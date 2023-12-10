@@ -1,0 +1,45 @@
+nav li {
+    display: inline-block;
+    margin: 0.5em;
+    padding: 0.5em 2em;
+    text-decoration: none;
+    color: #007BFF;
+    font-size: 1em;
+    transition: color 0.3s;
+    position: relative;
+    overflow: hidden;
+    border: #333 1px solid;
+    text-decoration: none;
+}
+
+section {
+    padding: 20px;
+    background-color: #f8f9fa;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 4px;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    position: relative;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.change-password-button {
+    margin-top: 25em; /* Adjust as needed */
+    padding-top: 1em;
+}

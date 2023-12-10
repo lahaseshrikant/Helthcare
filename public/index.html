@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthCheck Form</title>
+  <link rel="stylesheet" href="styleindex.css">
+</head>
+
+<body>
+  <h1>Welcome to HealthCheck App</h1>
+  <div style="margin-bottom: 20px;">
+    <a href="conditions.html" id="conditionsLink" class="nav-button">Conditions</a>
+    <a href="dashboard.html" id="dashboardLink" class="nav-button">Dashboard</a>
+    <a href="healthChecks.html" id="healthChecksLink" class="nav-button">Health Checks</a>
+    <a href="login.html" id="loginLink" class="nav-button">Login</a>
+    <a href="register.html" id="registerLink" class="nav-button">Register</a>
+    <a href="/logout" class="nav-button">Logout</a>
+  </div>
+  <h2>HealthCheck Form</h2>
+  
+  <p>Enter your name, age, and symptoms to get a list of suggested conditions.</p>
+ 
+  <p>Enter your symptoms separated by commas.</p>
+  
+  <form id="healthCheckForm">
+    <label for="name">Enter your name:</label>
+    <input type="text" id="name" name="name" required placeholder="Shrikant">
+    <label for="age">Enter your age:</label>
+    <input type="number" id="age" name="age" required placeholder="21">
+    <label for="symptoms">Enter your symptoms (comma-separated):</label>
+    <input type="text" id="symptoms" name="symptoms" required placeholder="headache, cold">
+    <button type="submit">Submit</button>
+  </form>
+  <div id="result"></div>
+  <!-- ...existing HTML code... -->
+  <!-- ...existing HTML code... -->
+
+  <script>
+    document.getElementById('healthCheckForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const name = document.getElementById('name').value;
+      const age = document.getElementById('age').value;
+      const symptomsInput = document.getElementById('symptoms');
+      const symptoms = symptomsInput.value.split(',').map(symptom => symptom.trim());
+
+      // Validate the symptoms
+      if (symptoms.some(symptom => symptom === '')) {
+        alert('Please enter valid symptoms separated by commas.');
+        return;
+      }
+
+      // Fetch condition details from the server
+      fetchConditionDetails(symptoms)
+        .then(details => {
+          // Update the page with the fetched condition details
+          updatePageWithConditionDetails(details, name);
+        })
+        .catch(error => {
+          console.error('Failed to fetch condition details:', error);
+          alert('Failed to fetch condition details. Please try again later.');
+        });
+    });
+
+    function fetchConditionDetails(symptoms) {
+      const apiUrl = 'http://localhost:3000/checkHealth';
+
+      return fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ symptoms }),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          return {
+            suggestedConditions: data.suggestedConditions || [], // Ensure it's an array
+            inputSymptoms: symptoms,
+          };
+        });
+    }
+
+    function updatePageWithConditionDetails(details) {
+      const resultDiv = document.getElementById('result');
+
+      // Ensure that resultDiv exists before attempting to set innerHTML
+      if (resultDiv) {
+        if (Array.isArray(details.suggestedConditions)) {
+          resultDiv.innerHTML = `<p>Suggested Conditions: ${details.suggestedConditions.join(', ')}</p>`;
+
+          // Display a message to the user
+          const name = document.getElementById('name').value;
+          document.getElementById('result').innerHTML = `Thank you ${name}, your form has been submitted.`;
+        } else {
+          console.error('details.suggestedConditions is not an array');
+        }
+      }
+    }
+
+    // ... other functions ...
+
+  </script>
+  <script src="script.js"></script>
+  <!-- Navigation buttons -->
+  
+
+  <!-- ...existing HTML code... -->
+
+</body>
+
+</html>

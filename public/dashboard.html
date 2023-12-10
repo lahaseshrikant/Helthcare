@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="styleindex.css">
+</head>
+
+<body>
+  <header>
+    <h1>Welcome to Your Dashboard</h1>
+  </header>
+  <nav style="margin-bottom: 20px;" class="navbar">
+    <a href="conditions.html" id="conditionsLink" class="nav-button">Conditions</a>
+    <a href="index.html" id="indexLink" class="nav-button">Home</a>
+    <a href="healthChecks.html" id="healthChecksLink" class="nav-button">Health Checks</a>
+    <a href="login.html" id="loginLink" class="nav-button">Login</a>
+    <a href="register.html" id="registerLink" class="nav-button">Register</a>
+    <a href="/logout" class="nav-button">Logout</a>
+    <a href="javascript:void(0);" class="icon" id="navbarButton" onclick="myFunction1()">&#9776;</a>
+  </nav>
+
+  <section id="overview">
+    <h2>Overview</h2>
+    <!-- Add overview content here -->
+  </section>
+
+  <section id="profile">
+    <h2>Profile</h2>
+    <div>
+      <p>Username: <span id="username"></span></p>
+      <p>Email: <span id="email"></span></p>
+      <!-- Add other profile information here -->
+    </div>
+  </section>
+
+  <section id="settings">
+    <h2>Settings</h2>
+    <form id="settingsForm">
+      <label for="newPassword" id="passwordBox">New Password:</label>
+      <input type="password" id="newPassword" name="newPassword">
+      <button type="submit" class=".change-password-button">Change Password</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2023 Health Check</p>
+  </footer>
+
+  <script src="dashboard.js"></script>
+  <script src="scriptCommon.js"></script>
+</body>
+
+</html>

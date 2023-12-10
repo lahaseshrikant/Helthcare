@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Condition Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+
+    h1 {
+      text-align: center;
+    }
+
+    #conditionDetails {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    #conditionDetails div {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 20px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #conditionDetails h2 {
+      margin: 0 0 10px 0;
+    }
+
+    #conditionDetails p {
+      margin: 0 0 10px 0;
+    }
+
+    #conditionDetails button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+
+    #conditionDetails button:hover {
+      background-color: #0056b3;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Health Condition Details</h1>
+
+  <div id="conditionDetails">
+    <!-- Condition details will be displayed here -->
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Get the condition ID from the URL
+      const conditionId = window.location.pathname.split('/').pop();
+
+      // Fetch condition details from the server
+      fetch(`/conditions/${conditionId}`)
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+
+    });
+
+    function displayConditionDetails(data) {
+      const conditionDetailsContainer = document.getElementById('conditionDetails');
+
+      if (data.error) {
+        // Display an error message if condition details are not available
+        conditionDetailsContainer.innerHTML = `<p>${data.error}</p>`;
+      } else {
+        // Display condition details
+        const conditionId = data.conditionId;
+        const conditionDetails = data.conditionDetails;
+
+        conditionDetailsContainer.innerHTML = `<h2>Condition ID: ${conditionId}</h2> <p>${conditionDetails}</p>`;
+      }
+    }
+
+    function displayError(message) {
+      const conditionDetailsContainer = document.getElementById('conditionDetails');
+      conditionDetailsContainer.innerHTML = `<p style="color: red;">${message}</p>`;
+    }
+
+  </script>
+  <script src="script.js"></script>
+
+</body>
+
+</html>

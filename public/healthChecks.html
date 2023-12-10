@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Checks</title>
+  <link rel="stylesheet" href="styleindex.css">
+  <style>
+    /* Add your CSS styles here */
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #healthCheckList {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #healthCheckList li {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Health Checks</h1>
+  <a href="index.html" id="homeLink" class="nav-button">Home</a>
+  <a href="logout" id="logoutLink" class="nav-button">Logout</a>
+  <ul id="healthCheckList"></ul>
+
+  <script>
+    // Fetch the health checks from the backend
+    fetch('http://localhost:3000/healthChecks')
+      .then(response => response.json())
+      .then(healthChecks => {
+        // Get the healthCheckList ul
+        const healthCheckList = document.getElementById('healthCheckList');
+
+        // Add each health check to the ul
+        healthChecks.forEach(healthCheck => {
+          const li = document.createElement('li');
+          li.textContent = `Symptoms: ${healthCheck.symptoms}, Conditions: ${healthCheck.conditions}`;
+          healthCheckList.appendChild(li);
+        });
+      })
+      .catch(error => console.error('Error:', error));
+  </script>
+  <!-- Include the script.js file -->
+  <script src="script.js"></script>
+</body>
+
+</html>

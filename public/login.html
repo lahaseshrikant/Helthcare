@@ -1,0 +1,52 @@
+<!-- public/login.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Login</title>
+</head>
+
+<body>
+  <div class="form-container" id="loginFormContainer">
+    <h2>Login</h2>
+    <form id="loginForm" method="POST" action="/login>
+      <label for="loginUsername">Username:</label>
+      <input type="text" id="loginUsername" name="username" required>
+      <label for="loginPassword">Password:</label>
+      <input type="password" id="loginPassword" name="password" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+
+  <div class="form-container" id="registerFormContainer">
+    <h2>Registration</h2>
+    <form id="registerForm">
+      <label for="registerUsername">Username:</label>
+      <input type="text" id="registerUsername" name="username" required>
+      <br>
+      <label for="registerPassword">Password:</label>
+      <input type="password" id="registerPassword" name="password" required>
+      <br>
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script src="login.js"></script>
+  <script>
+    // Check if user is already registered
+    const registeredUser = localStorage.getItem('registeredUser');
+    if (registeredUser) {
+      // If user is registered, hide the registration form
+      document.getElementById('registerFormContainer').style.display = 'none';
+    } else {
+      // If user is not registered, hide the login form
+      document.getElementById('loginFormContainer').style.display = 'none';
+    }
+  </script>
+</body>
+
+</html>

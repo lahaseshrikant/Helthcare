@@ -1,0 +1,158 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#result {
+    margin-top: 20px;
+}
+
+#result table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.nav-button {
+    display: inline-block;
+    margin: 0.5em;
+    padding: 0.5em 2em;
+    text-decoration: none;
+    color: #007BFF;
+    font-size: 1em;
+    transition: color 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+/* Style for the navigation bar */
+.navbar {
+    display: flex;
+    justify-content: flex-end; /* Align links to the right */
+    align-items: center;
+    overflow: hidden;
+    padding: 0px;
+    margin: 5px; 
+    font-family: -apple-system,BlinkMacSystemFont,Trebuchet MS,Roboto,Ubuntu,sans-serif;
+}
+
+        /* Navigation bar links */
+.navbar a {
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+        /* On hover, the links will change color */
+.navbar a:hover {
+    background-color: #585b63;
+    border-bottom-left-radius: 25%;
+    border-top-right-radius: 25%;
+}
+
+/* Responsive navigation menu */
+.navbar .icon {
+    display: none;
+}
+
+@media screen and (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-end;
+        
+    }
+
+    .navbar .icon {
+        display: block;
+        order: -1; /* Place the icon at the top on small screens */
+    }
+
+    .navbar a:not(:last-child) {
+        display: none;
+    }
+
+    .navbar.responsive a {
+        display: block;
+        text-align: center;
+        color: #000;
+    }
+    .navbar.responsive {
+        overflow-y: auto; /* Enable vertical scrolling for the menu */
+        max-height: 100vh; /* Set the maximum height for the menu */
+        position: absolute;
+        right: 0px;
+        z-index: 1;
+        border-top-left-radius: 50%;
+        border-bottom-left-radius: 50%;
+        background: linear-gradient(to bottom, #0072FF, #00C6FF);
+    }
+    .navbar.responsive a:hover {
+        font-size:larger;
+        color: white;
+        background: none;
+    }    
+}
+.nav-button:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: #007BFF;
+    transition: left 0.3s;
+    z-index: -1;
+}
+
+.nav-button:hover {
+    color: #fff;
+}
+
+.nav-button:hover:before {
+    left: 0;
+}
+
+@media (max-width: 600px) {
+    .nav-button {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin: 0.2em 0;
+        padding: 0.5em;
+    }
+}
+
