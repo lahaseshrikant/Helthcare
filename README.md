@@ -42,3 +42,28 @@ Ensure you have the following installed on your system:
 Install dependencies:
    ```bash
     npm install
+Run the application:
+
+bash
+Copy code
+npm start
+Access the app at http://localhost:3000.
+
+Usage
+Open http://localhost:3000 in your browser.
+Register or log in.
+Use the HealthCheck form to enter name, age, and symptoms.
+Get enhanced suggestions for health conditions.
+View and manage your health check history.
+API Documentation
+Explore the API at http://localhost:3000/api-docs for endpoint details.
+
+Contributing
+Contributions welcome! Follow Contributing Guidelines.
+
+License
+MIT License
+
+csharp
+Copy code
+
