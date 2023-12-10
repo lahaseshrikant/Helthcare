@@ -64,4 +64,5 @@ Explore the API at http://localhost:3000/api-docs for endpoint details.
 Contributions welcome! Follow Contributing Guidelines.
 
 ## License
-MIT License
+MIT License 
+https://github.com/lahaseshrikant/Helthcare/blob/main/LICENSE
