@@ -36,4 +36,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
   });
+  fetch('/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, password }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // If login is successful, redirect to dashboard
+        window.location.href = '/dashboard';
+      } else {
+        // If login is not successful, show an error message
+        alert(data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Login Error:', error.message);
+    });
   
