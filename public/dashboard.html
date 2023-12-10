@@ -23,11 +23,29 @@
     <a href="javascript:void(0);" class="icon" id="navbarButton" onclick="myFunction1()">&#9776;</a>
   </nav>
 
-  <section id="overview">
-    <h2>Overview</h2>
-    <!-- Add overview content here -->
+  <section id="recentHealthChecks">
+    <h2>Recent Health Checks</h2>
+    <ul id="healthCheckList"></ul>
   </section>
-
+  
+  <section id="submitHealthCheck">
+    <h2>Submit a Health Check</h2>
+    <form id="healthCheckForm">
+      <label for="symptoms">Enter your symptoms (comma-separated):</label>
+      <input type="text" id="symptoms" name="symptoms" required>
+      <button type="submit">Submit Health Check</button>
+    </form>
+  </section>
+  
+  <section id="feedbackForm">
+    <h2>Give Us Your Feedback</h2>
+    <form id="feedbackForm">
+      <label for="feedback">Your Feedback:</label>
+      <textarea id="feedback" name="feedback" required></textarea>
+      <button type="submit">Submit Feedback</button>
+    </form>
+  </section>
+  
   <section id="profile">
     <h2>Profile</h2>
     <div>

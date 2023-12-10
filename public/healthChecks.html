@@ -40,8 +40,14 @@
   <script>
     // Fetch the health checks from the backend
     fetch('http://localhost:3000/healthChecks')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(healthChecks => {
+        console.log(healthChecks); // Log the response for debugging
         // Get the healthCheckList ul
         const healthCheckList = document.getElementById('healthCheckList');
 
@@ -59,3 +65,4 @@
 </body>
 
 </html>
+

@@ -71,17 +71,10 @@ button:hover {
 
         /* Navigation bar links */
 .navbar a {
-    color: white;
+    color: #0072FF;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
-}
-
-        /* On hover, the links will change color */
-.navbar a:hover {
-    background-color: #585b63;
-    border-bottom-left-radius: 25%;
-    border-top-right-radius: 25%;
 }
 
 /* Responsive navigation menu */
@@ -108,7 +101,7 @@ button:hover {
     .navbar.responsive a {
         display: block;
         text-align: center;
-        color: #000;
+        color: #0072FF;
     }
     .navbar.responsive {
         overflow-y: auto; /* Enable vertical scrolling for the menu */
@@ -125,6 +118,14 @@ button:hover {
         color: white;
         background: none;
     }    
+    .nav-button {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin: 0.2em 0;
+        padding: 0.5em;
+    }
+    
 }
 .nav-button:before {
     content: "";
@@ -144,15 +145,5 @@ button:hover {
 
 .nav-button:hover:before {
     left: 0;
-}
-
-@media (max-width: 600px) {
-    .nav-button {
-        display: block;
-        width: 100%;
-        text-align: center;
-        margin: 0.2em 0;
-        padding: 0.5em;
-    }
 }
 
