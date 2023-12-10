@@ -6,7 +6,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
-const swaggerDocument = require('./swagger.json'); // Create this file for your API documentation
+const swaggerDocument = require('./swagger.json'); //  API documentation
+const crypto = require('crypto');
 require('./enhancer'); // Import the enhancement logic
 
 const app = express();
@@ -28,8 +29,10 @@ db.serialize(() => {
 });
 
 // Use the session middleware
+const secret = crypto.randomBytes(64).toString('hex');
+
 app.use(session({
-  secret: 'your-secret-key', // Change this to a secure secret
+  secret: secret,
   resave: false,
   saveUninitialized: false,
 }));
@@ -41,7 +44,7 @@ app.use(passport.session());
 // Set up a local strategy for authentication
 passport.use(new LocalStrategy(
   (username, password, done) => {
-    // Replace this with your actual authentication logic
+    // authentication logic
     db.get('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, row) => {
       if (err) {
         return done(err);
@@ -320,10 +323,6 @@ function getConditionDetails(conditionId) {
   // Implement logic to fetch details from your data source
   // Return an object with information about the condition
 }
-app.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
-});
 
 // Start the server
 const server = app.listen(port, () => {
