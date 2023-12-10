@@ -282,9 +282,7 @@ app.get('/conditions/:conditionId', (req, res) => {
   }
 });
 
-// ... Existing code ...
-
-// Add a new endpoint to retrieve recent health checks
+// new endpoint to retrieve recent health checks
 app.get('/api/recentHealthChecks', (req, res) => {
   // Replace this with your actual logic to retrieve recent health checks
   const recentHealthChecks = [
@@ -295,33 +293,80 @@ app.get('/api/recentHealthChecks', (req, res) => {
 
   res.json(recentHealthChecks);
 });
-
-// Add a new endpoint to submit a health check
+new endpoint to submit a health check
 app.post('/api/submitHealthCheck', (req, res) => {
   const { symptoms } = req.body;
 
-  // Replace this with your actual logic to store the health check
-  // Example: Store the health check in the database
+  // table named 'health_checks'
+  const insertQuery = 'INSERT INTO health_checks (symptoms) VALUES (?)';
 
-  res.json({ message: 'Health check submitted successfully' });
+  // database query to store the health check
+  db.run(insertQuery, [symptoms.join(', ')], (error) => {
+    if (error) {
+      console.error('Error storing health check:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.json({ message: 'Health check submitted successfully' });
+    }
+  });
 });
 
-// Add a new endpoint to submit feedback
+// new endpoint to submit feedback
 app.post('/api/submitFeedback', (req, res) => {
   const { feedback } = req.body;
 
-  // Replace this with your actual logic to handle feedback
-  // Example: Store the feedback in the database
+  // table name: feedback
+  
+  const query = 'INSERT INTO feedback (message) VALUES (?)';
 
-  res.json({ message: 'Feedback submitted successfully' });
+  // database query to store the feedback
+  db.run(query, [feedback], (err) => {
+    if (err) {
+      console.error('Error storing feedback:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.json({ message: 'Feedback submitted successfully' });
+    }
+  });
 });
 
-// ... Existing code ...
+// new endpoint to retrieve details about specific health conditions
+app.get('/conditions/:conditionId', (req, res) => {
+  const conditionId = req.params.conditionId;
 
+  // logic to fetch details about the specified health condition from database or an external API
+  const conditionDetails = getConditionDetails(conditionId);
 
+  if (conditionDetails) {
+    res.json({ conditionId, conditionDetails });
+  } else {
+    res.status(404).json({ error: 'Condition not found' });
+  }
+});
+
+// Function to get details about a health condition
 function getConditionDetails(conditionId) {
-  // Implement logic to fetch details from your data source
-  // Return an object with information about the condition
+  // database table name'conditions'
+  const query = 'SELECT * FROM conditions WHERE id = ?';
+
+  // database query to get the details
+  return new Promise((resolve, reject) => {
+    db.get(query, [conditionId], (err, row) => {
+      if (err) {
+        reject(err);
+      } else if (row) {
+        // Resolve with condition details
+        resolve({
+          name: row.name,
+          description: row.description,
+          // Add other details as needed
+        });
+      } else {
+        // Resolve with null if condition not found
+        resolve(null);
+      }
+    });
+  });
 }
 
 // Start the server
