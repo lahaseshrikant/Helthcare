@@ -293,7 +293,7 @@ app.get('/api/recentHealthChecks', (req, res) => {
 
   res.json(recentHealthChecks);
 });
-new endpoint to submit a health check
+// new endpoint to submit a health check
 app.post('/api/submitHealthCheck', (req, res) => {
   const { symptoms } = req.body;
 
@@ -310,6 +310,7 @@ app.post('/api/submitHealthCheck', (req, res) => {
     }
   });
 });
+
 
 // new endpoint to submit feedback
 app.post('/api/submitFeedback', (req, res) => {
