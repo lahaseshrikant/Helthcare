@@ -6,17 +6,16 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
+const bcrypt = require('bcrypt');
 const swaggerDocument = require('./swagger.json'); //  API documentation
 const crypto = require('crypto');
 require('./enhancer'); // Import the enhancement logic
 
+const db = require('./db');
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-
-// SQLite database setup
-const db = new sqlite3.Database(':memory:'); // Use ':memory:' for in-memory database
 
 // Create a table for storing health check data
 db.serialize(() => {
@@ -26,6 +25,16 @@ db.serialize(() => {
 // Create a table for storing user data
 db.serialize(() => {
   db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)');
+});
+
+// Create a table for storing feedback data
+db.serialize(() => {
+  db.run('CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY, message TEXT)');
+});
+
+// Create a table for storing health condition data (if needed)
+db.serialize(() => {
+  db.run('CREATE TABLE IF NOT EXISTS conditions (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
 });
 
 // Use the session middleware
@@ -45,16 +54,26 @@ app.use(passport.session());
 passport.use(new LocalStrategy(
   (username, password, done) => {
     // authentication logic
-    db.get('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, row) => {
+    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
       if (err) {
         return done(err);
       }
 
       if (!row) {
-        return done(null, false, { message: 'Incorrect username or password' });
+        return done(null, false, { message: 'Incorrect username.' });
       }
 
-      return done(null, { id: row.id, username: row.username });
+      bcrypt.compare(password, row.password, (err, isMatch) => {
+        if (err) {
+          return done(err);
+        }
+
+        if (isMatch) {
+          return done(null, row);
+        } else {
+          return done(null, false, { message: 'Incorrect password.' });
+        }
+      });
     });
   }
 ));
@@ -78,6 +97,74 @@ passport.deserializeUser((id, done) => {
 
     return done(null, { id: row.id, username: row.username });
   });
+});
+
+// Registration endpoint
+app.post('/register', (req, res) => {
+  const { username, password } = req.body;
+
+  // Check if username or password is missing
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required' });
+  }
+
+  // Check if the username is already taken
+  db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    if (row) {
+      return res.status(400).json({ error: 'Username is already taken' });
+    }
+
+    // Hash the password before storing it
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+      if (err) {
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      // Insert the new user into the database
+      db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (err) => {
+        if (err) {
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        res.json({ message: 'Registration successful' });
+      });
+    });
+  });
+});
+
+
+// Serve the login page
+app.get('/login', (req, res) => {
+  res.sendFile(__dirname + '/public/login.html');
+});
+
+// Serve the login script
+app.get('/login.js', (req, res) => {
+  res.sendFile(__dirname + '/public/login.js');
+});
+
+// Handle login form submission
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/dashboard', // Redirect to the dashboard on successful login
+  failureRedirect: '/login', // Redirect back to the login page on failed login
+}));
+
+// Secure a route with authentication
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    res.redirect('/login'); // Redirect to login page if not authenticated
+  }
+}
+
+// Secure a route with authentication
+app.get('/secureRoute', ensureAuthenticated, (req, res) => {
+  res.send(`Welcome, ${req.user.username}! This is a secure route. <a href="/logout">Logout</a>`);
 });
 
 // Welcome route
@@ -117,36 +204,6 @@ app.post('/checkHealth', (req, res) => {
 });
 
 
-// Registration endpoint
-app.post('/register', (req, res) => {
-  const { username, password } = req.body;
-
-  // Check if username or password is missing
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' });
-  }
-
-  // Check if the username is already taken
-  db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-    if (row) {
-      return res.status(400).json({ error: 'Username is already taken' });
-    }
-
-    // Insert the new user into the database
-    db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, password], (err) => {
-      if (err) {
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
-
-      res.json({ message: 'Registration successful' });
-    });
-  });
-});
-
 // Serve the Swagger UI for API documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -175,27 +232,6 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(__dirname + '/public/dashboard.html');
 });
 
-// Serve the login page
-app.get('/login', (req, res) => {
-  res.sendFile(__dirname + '/public/login.html');
-});
-
-// Serve the login script
-app.get('/login.js', (req, res) => {
-  res.sendFile(__dirname + '/public/login.js');
-});
-
-// Handle login form submission
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/', // Redirect to the dashboard on successful login
-  failureRedirect: '/login', // Redirect back to the login page on failed login
-}));
-
-// Secure a route with authentication
-app.get('/secureRoute', ensureAuthenticated, (req, res) => {
-  res.send(`Welcome, ${req.user.username}! This is a secure route. <a href="/logout">Logout</a>`);
-});
-
 // Logout route
 
 app.get('/logout', (req, res) => {
@@ -207,37 +243,65 @@ app.get('/logout', (req, res) => {
   });
 });
 
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  } else {
-    res.redirect('/login'); // Redirect to login page if not authenticated
-  }
-}
-
 // Add a new endpoint to retrieve user information
 app.get('/api/user', (req, res) => {
   // Replace this with your actual user retrieval logic
-  const user = {
-    username: 'JohnDoe',
-    email: 'john.doe@example.com',
-    // Add other user information as needed
-  };
+  if (req.isAuthenticated()) {
+    const userId = req.user.id;
 
-  res.json(user);
+    // Fetch user information from the database based on the user's ID
+    db.get('SELECT * FROM users WHERE id = ?', [userId], (err, row) => {
+      if (err) {
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      if (!row) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Replace the following line with your actual user object structure
+      const user = { id: row.id, username: row.username, email: row.email };
+      res.json(user);
+    });
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
 });
+
 
 // Add a new endpoint to change the user's password
 app.post('/api/changePassword', (req, res) => {
   const { newPassword } = req.body;
 
   // Replace this with your actual password change logic
-  // Example: Update the password in the database
-  // Example: Hash the new password before saving it
+  // Example: Get the currently authenticated user
+  const currentUser = req.user;
 
-  res.json({ message: 'Password changed successfully' });
+  if (!currentUser) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Example: Hash the new password
+  bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+    if (err) {
+      console.error('Error hashing password:', err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Example: Update the password in the database
+    const updateQuery = 'UPDATE users SET password = ? WHERE id = ?';
+
+    db.run(updateQuery, [hashedPassword, currentUser.id], (updateErr) => {
+      if (updateErr) {
+        console.error('Error updating password:', updateErr);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      res.json({ message: 'Password changed successfully' });
+    });
+  });
 });
-
+;
 
 /** 
  * Enhances the given symptoms and returns an array of enhanced suggestions.
@@ -245,7 +309,7 @@ app.post('/api/changePassword', (req, res) => {
  * @returns {string[]} - The array of enhanced suggestions.
  */
 function getEnhancedSuggestions(symptoms) {
-  // Add your enhancement logic here based on the actual symptoms
+  // enhancement logic here based on the actual symptoms
   const enhancedSuggestions = symptoms.map(symptom => {
       let enhancedSymptom = symptom;
 
@@ -268,11 +332,11 @@ function getEnhancedSuggestions(symptoms) {
 module.exports = { getEnhancedSuggestions };
 
 
-// Add a new endpoint to retrieve details about specific health conditions
+// new endpoint to retrieve details about specific health conditions
 app.get('/conditions/:conditionId', (req, res) => {
   const conditionId = req.params.conditionId;
 
-  // Implement logic to fetch details about the specified health condition from your database or an external API
+  // logic to fetch details about the specified health condition from your database or an external API
   const conditionDetails = getConditionDetails(conditionId);
 
   if (conditionDetails) {
@@ -284,15 +348,20 @@ app.get('/conditions/:conditionId', (req, res) => {
 
 // new endpoint to retrieve recent health checks
 app.get('/api/recentHealthChecks', (req, res) => {
-  // Replace this with your actual logic to retrieve recent health checks
-  const recentHealthChecks = [
-    { symptoms: 'Fever, Headache', conditions: 'Flu' },
-    { symptoms: 'Cough, Shortness of breath', conditions: 'COVID-19' },
-    // Add more recent health checks
-  ];
+  
+  const selectQuery = 'SELECT * FROM health_checks ORDER BY id DESC LIMIT 5';
 
-  res.json(recentHealthChecks);
+  // a database query to retrieve recent health checks
+  db.all(selectQuery, (error, rows) => {
+    if (error) {
+      console.error('Error retrieving recent health checks:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.json(rows);
+    }
+  });
 });
+
 // new endpoint to submit a health check
 app.post('/api/submitHealthCheck', (req, res) => {
   const { symptoms } = req.body;
@@ -346,27 +415,29 @@ app.get('/conditions/:conditionId', (req, res) => {
 });
 
 // Function to get details about a health condition
-function getConditionDetails(conditionId) {
-  // database table name'conditions'
-  const query = 'SELECT * FROM conditions WHERE id = ?';
 
-  // database query to get the details
-  return new Promise((resolve, reject) => {
-    db.get(query, [conditionId], (err, row) => {
+function getConditionDetails(conditionId) {
+  let db = new sqlite3.Database('./db/healthcare.db', sqlite3.OPEN_READONLY, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+    console.log('Connected to the healthcare database.');
+  });
+
+  db.serialize(() => {
+    db.each(`SELECT * FROM conditions WHERE id = ?`, [conditionId], (err, row) => {
       if (err) {
-        reject(err);
-      } else if (row) {
-        // Resolve with condition details
-        resolve({
-          name: row.name,
-          description: row.description,
-          // Add other details as needed
-        });
-      } else {
-        // Resolve with null if condition not found
-        resolve(null);
+        console.error(err.message);
       }
+      return row;
     });
+  });
+
+  db.close((err) => {
+    if (err) {
+      console.error(err.message);
+    }
+    console.log('Close the database connection.');
   });
 }
 
@@ -375,4 +446,4 @@ const server = app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-module.exports = { app, server, db };
+module.exports = { app, server};

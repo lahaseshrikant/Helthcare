@@ -80,7 +80,7 @@ window.onload = function () {
 
 async function fetchConditionDetails(symptoms) {
     const apiUrl = 'http://localhost:3000/login';
-  
+
     const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -96,5 +96,5 @@ async function fetchConditionDetails(symptoms) {
         suggestedConditions: data.suggestedConditions,
         inputSymptoms: symptoms,
     };
-  }
-  
+}
+

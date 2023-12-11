@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('./index');
+
+const { db } = require('./db');
 
 // HealthCheck endpoint
 router.post('/checkHealth', (req, res) => {

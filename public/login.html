@@ -12,7 +12,7 @@
 <body>
   <div class="form-container" id="loginFormContainer">
     <h2>Login</h2>
-    <form id="loginForm" method="POST" action="/login>
+    <form id="loginForm" method="POST" action="/login">
       <label for="loginUsername">Username:</label>
       <input type="text" id="loginUsername" name="username" required>
       <label for="loginPassword">Password:</label>
@@ -24,7 +24,7 @@
 
   <div class="form-container" id="registerFormContainer">
     <h2>Registration</h2>
-    <form id="registerForm">
+    <form id="registerForm" method="POST" action="/register">
       <label for="registerUsername">Username:</label>
       <input type="text" id="registerUsername" name="username" required>
       <br>
@@ -35,7 +35,6 @@
     </form>
   </div>
 
-  <script src="login.js"></script>
   <script>
     // Check if user is already registered
     const registeredUser = localStorage.getItem('registeredUser');
@@ -47,6 +46,7 @@
       document.getElementById('loginFormContainer').style.display = 'none';
     }
   </script>
+  <script src="login.js"></script>
 </body>
 
 </html>
