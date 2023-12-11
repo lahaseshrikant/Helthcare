@@ -1,4 +1,14 @@
 {
+  "swagger": "2.0",  
+  "info": {
+    "version": "1.0.0",
+    "title": "Health Check API",
+    "description": "API for performing health checks based on symptoms",
+    "contact": {
+      "name": "Health Check API Support",
+      "email": "your.email@example.com"
+    }
+  },
   "paths": {
     "/checkHealth": {
       "post": {

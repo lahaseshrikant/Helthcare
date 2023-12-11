@@ -148,10 +148,16 @@ app.get('/login.js', (req, res) => {
 });
 
 // Handle login form submission
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/dashboard', // Redirect to the dashboard on successful login
-  failureRedirect: '/login', // Redirect back to the login page on failed login
-}));
+app.post('/login', passport.authenticate('local'), (req, res) => {
+  // If authentication is successful, send a success JSON response
+  res.json({ success: true });
+});
+
+// Add a failure route if authentication fails
+app.post('/login', (req, res) => {
+  // If authentication fails, send a failure JSON response
+  res.status(401).json({ success: false, message: 'Authentication failed' });
+});
 
 // Secure a route with authentication
 function ensureAuthenticated(req, res, next) {

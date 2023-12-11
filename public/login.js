@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const username = document.getElementById('registerUsername').value;
     const password = document.getElementById('registerPassword').value;
 
-    fetch('/register', {
+    fetch('./register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -45,14 +45,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
 
-    fetch('/login', {
+    fetch('./login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ username, password }),
     })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(data => {
         if (data.success) {
           // If login is successful, redirect to dashboard

@@ -78,23 +78,30 @@ window.onload = function () {
     });
 }
 
-async function fetchConditionDetails(symptoms) {
-    const apiUrl = 'http://localhost:3000/login';
-
-    const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ symptoms }),
-    });
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return {
-        suggestedConditions: data.suggestedConditions,
-        inputSymptoms: symptoms,
-    };
-}
+function fetchConditionDetails(symptoms) {
+    const apiUrl = 'http://localhost:3000/checkHealth';
+  
+    console.log('Request Payload:', { symptoms }); // Log the request payload
+  
+    return fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ symptoms }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        return {
+          suggestedConditions: data.suggestedConditions || [],
+          inputSymptoms: symptoms,
+        };
+      });
+  }
+  
 
