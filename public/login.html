@@ -1,4 +1,3 @@
-<!-- public/login.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,9 +17,9 @@
       <label for="loginPassword">Password:</label>
       <input type="password" id="loginPassword" name="password" required>
       <button type="submit">Login</button>
+      <a href="/register" id="registerLink" style="float: right; margin: 5px;">Not registered?</a>
     </form>
   </div>
-
 
   <div class="form-container" id="registerFormContainer">
     <h2>Registration</h2>
@@ -36,13 +35,13 @@
   </div>
 
   <script>
-    // Check if user is already registered
-    const registeredUser = localStorage.getItem('registeredUser');
-    if (registeredUser) {
-      // If user is registered, hide the registration form
+    // Get registered users from local storage
+  const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    if (registeredUsers.length > 0) {
+      // If there are any registered users, hide the registration form
       document.getElementById('registerFormContainer').style.display = 'none';
     } else {
-      // If user is not registered, hide the login form
+      // If there are no registered users, hide the login form
       document.getElementById('loginFormContainer').style.display = 'none';
     }
   </script>

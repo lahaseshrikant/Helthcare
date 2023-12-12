@@ -10,8 +10,10 @@ const bcrypt = require('bcrypt');
 const swaggerDocument = require('./swagger.json'); //  API documentation
 const crypto = require('crypto');
 require('./enhancer'); // Import the enhancement logic
+const apiRoutes = require('./api');
 
 const db = require('./db');
+const { error } = require('console');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -19,7 +21,7 @@ app.use(express.json());
 
 // Create a table for storing health check data
 db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS health_checks (id INTEGER PRIMARY KEY, symptoms TEXT, conditions TEXT)');
+  db.run('CREATE TABLE IF NOT EXISTS health_checks (id INTEGER, symptoms TEXT, conditions TEXT)');
 });
 
 // Create a table for storing user data
@@ -29,12 +31,12 @@ db.serialize(() => {
 
 // Create a table for storing feedback data
 db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY, message TEXT)');
+  db.run('CREATE TABLE IF NOT EXISTS feedback (id INTEGER,username TEXT, message TEXT)');
 });
 
 // Create a table for storing health condition data (if needed)
 db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS conditions (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
+  db.run('CREATE TABLE IF NOT EXISTS conditions (id INTEGER, name TEXT, description TEXT)');
 });
 
 // Use the session middleware
@@ -52,9 +54,9 @@ app.use(passport.session());
 
 // Set up a local strategy for authentication
 passport.use(new LocalStrategy(
-  (username, password, done) => {
+  function(username, password, done) {
     // authentication logic
-    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+    db.get('SELECT id, username, password FROM users WHERE username = ?', [username], function(err, row) {
       if (err) {
         return done(err);
       }
@@ -63,11 +65,10 @@ passport.use(new LocalStrategy(
         return done(null, false, { message: 'Incorrect username.' });
       }
 
-      bcrypt.compare(password, row.password, (err, isMatch) => {
+      bcrypt.compare(password, row.password, function(err, isMatch) {
         if (err) {
           return done(err);
         }
-
         if (isMatch) {
           return done(null, row);
         } else {
@@ -148,15 +149,32 @@ app.get('/login.js', (req, res) => {
 });
 
 // Handle login form submission
-app.post('/login', passport.authenticate('local'), (req, res) => {
-  // If authentication is successful, send a success JSON response
-  res.json({ success: true });
+app.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) { 
+      return next(err); 
+    }
+    if (!user) { 
+      // If authentication fails, send a failure JSON response
+      return res.status(401).json({ success: false, message: 'Invalid username or password' }); 
+    }
+    req.logIn(user, function(err) {
+      if (err) { 
+        return next(err); 
+      }
+      // If authentication is successful, send a success JSON response
+      return res.json({ success: true , message: 'Login successful' });
+    });
+  })(req, res, next);
 });
 
-// Add a failure route if authentication fails
-app.post('/login', (req, res) => {
-  // If authentication fails, send a failure JSON response
-  res.status(401).json({ success: false, message: 'Authentication failed' });
+// Add an endpoint to check login status
+app.get('/checkLoginStatus', (req, res) => {
+  // Check if the user is authenticated
+  const isAuthenticated = req.isAuthenticated();
+
+  // Send the login status as JSON
+  res.json({ loggedIn: isAuthenticated });
 });
 
 // Secure a route with authentication
@@ -183,7 +201,9 @@ app.get('/checkHealth', (req, res) => {
 });
 
 // HealthCheck endpoint
+// Example health check insertion
 app.post('/checkHealth', (req, res) => {
+  const userId = req.user.id; // Assuming user information is stored in req.user
   const symptoms = req.body.symptoms || [];
 
   // Check if symptoms is an array and is not empty
@@ -195,14 +215,13 @@ app.post('/checkHealth', (req, res) => {
   const conditions = suggestedConditions.join(', ');
 
   try {
-    // Store health check data in the database
-    db.run('INSERT INTO health_checks (symptoms, conditions) VALUES (?, ?)', [symptoms.join(', '), conditions]);
+    // Store health check data in the database, associating it with the logged-in user
+    db.run('INSERT INTO health_checks (id, symptoms, conditions) VALUES (?, ?, ?)', [userId, symptoms.join(', '), conditions]);
 
     res.json({
       suggestedConditions: conditions,
       inputSymptoms: symptoms,
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred while storing the health check data' });
@@ -210,11 +229,10 @@ app.post('/checkHealth', (req, res) => {
 });
 
 
+
 // Serve the Swagger UI for API documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Import the API routes
-const apiRoutes = require('./api');
 
 // Use the API routes
 app.use('/api', apiRoutes);
@@ -224,7 +242,10 @@ app.use(express.static('public'));
 
 // Get all health checks from the database
 app.get('/healthChecks', (req, res) => {
-  db.all('SELECT * FROM health_checks', (err, rows) => {
+  const userId = req.user.id; // Assuming user information is stored in req.user
+
+  // Fetch health checks only for the logged-in user
+  db.all('SELECT * FROM health_checks WHERE id = ?', [userId], (err, rows) => {
     if (err) {
       res.status(500).json({ error: 'Internal Server Error' });
     } else {
@@ -245,7 +266,7 @@ app.get('/logout', (req, res) => {
     if (err) {
       console.error(err);
     }
-    res.redirect('/');
+    res.redirect('/login');
   });
 });
 
@@ -275,39 +296,38 @@ app.get('/api/user', (req, res) => {
 });
 
 
+//new endpoint to change the user's password
 // Add a new endpoint to change the user's password
-app.post('/api/changePassword', (req, res) => {
-  const { newPassword } = req.body;
+app.post('/api/changePassword', async (req, res) => {
+  try {
+    const { newPassword } = req.body;
 
-  // Replace this with your actual password change logic
-  // Example: Get the currently authenticated user
-  const currentUser = req.user;
+    // Replace this with your actual password change logic
+    // Example: Get the currently authenticated user
+    const currentUser = req.user;
 
-  if (!currentUser) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  // Example: Hash the new password
-  bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
-    if (err) {
-      console.error('Error hashing password:', err);
-      return res.status(500).json({ error: 'Internal Server Error' });
+    if (!currentUser) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
+
+    // Example: Generate a new salt
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+
+    // Example: Hash the new password with the generated salt
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
     // Example: Update the password in the database
     const updateQuery = 'UPDATE users SET password = ? WHERE id = ?';
 
-    db.run(updateQuery, [hashedPassword, currentUser.id], (updateErr) => {
-      if (updateErr) {
-        console.error('Error updating password:', updateErr);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
+    await db.run(updateQuery, [hashedPassword, currentUser.id]);
 
-      res.json({ message: 'Password changed successfully' });
-    });
-  });
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Error changing password:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
-;
 
 /** 
  * Enhances the given symptoms and returns an array of enhanced suggestions.
@@ -334,9 +354,7 @@ function getEnhancedSuggestions(symptoms) {
   return enhancedSuggestions;
 }
 
-
 module.exports = { getEnhancedSuggestions };
-
 
 // new endpoint to retrieve details about specific health conditions
 app.get('/conditions/:conditionId', (req, res) => {
@@ -370,13 +388,20 @@ app.get('/api/recentHealthChecks', (req, res) => {
 
 // new endpoint to submit a health check
 app.post('/api/submitHealthCheck', (req, res) => {
-  const { symptoms } = req.body;
+  const userId = req.user.id; // Assuming user information is stored in req.user
+  const symptoms = req.body.symptoms || [];
+
+  // Check if symptoms is an array and is not empty
+  if (!Array.isArray(symptoms) || symptoms.length === 0) {
+    return res.status(400).json({ error: 'Invalid input' });
+  }
+
+  const suggestedConditions = getEnhancedSuggestions(symptoms);
+  const conditions = suggestedConditions.join(', ');
 
   // table named 'health_checks'
-  const insertQuery = 'INSERT INTO health_checks (symptoms) VALUES (?)';
-
-  // database query to store the health check
-  db.run(insertQuery, [symptoms.join(', ')], (error) => {
+  const insertQuery = 'INSERT INTO health_checks (id, symptoms, conditions) VALUES (?, ?, ?)';
+  db.run(insertQuery, [userId, symptoms.join(', '), conditions],(error) => {
     if (error) {
       console.error('Error storing health check:', error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -390,13 +415,14 @@ app.post('/api/submitHealthCheck', (req, res) => {
 // new endpoint to submit feedback
 app.post('/api/submitFeedback', (req, res) => {
   const { feedback } = req.body;
-
+  const userId = req.user.id;
+  const username = req.user.username;
   // table name: feedback
   
-  const query = 'INSERT INTO feedback (message) VALUES (?)';
+  const query = 'INSERT INTO feedback (id, username, message) VALUES (?, ?, ?)';
 
   // database query to store the feedback
-  db.run(query, [feedback], (err) => {
+  db.run(query, [userId,username,feedback], (err) => {
     if (err) {
       console.error('Error storing feedback:', err);
       res.status(500).json({ error: 'Internal Server Error' });

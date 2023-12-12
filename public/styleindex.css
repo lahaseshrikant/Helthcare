@@ -58,18 +58,20 @@ button:hover {
     position: relative;
     overflow: hidden;
 }
+
 /* Style for the navigation bar */
 .navbar {
     display: flex;
-    justify-content: flex-end; /* Align links to the right */
+    justify-content: flex-end;
+    /* Align links to the right */
     align-items: center;
     overflow: hidden;
     padding: 0px;
-    margin: 5px; 
-    font-family: -apple-system,BlinkMacSystemFont,Trebuchet MS,Roboto,Ubuntu,sans-serif;
+    margin: 5px;
+    font-family: -apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif;
 }
 
-        /* Navigation bar links */
+/* Navigation bar links */
 .navbar a {
     color: #0072FF;
     text-align: center;
@@ -86,12 +88,13 @@ button:hover {
     .navbar {
         flex-direction: column;
         align-items: flex-end;
-        
+
     }
 
     .navbar .icon {
         display: block;
-        order: -1; /* Place the icon at the top on small screens */
+        order: -1;
+        /* Place the icon at the top on small screens */
     }
 
     .navbar a:not(:last-child) {
@@ -103,9 +106,12 @@ button:hover {
         text-align: center;
         color: #0072FF;
     }
+
     .navbar.responsive {
-        overflow-y: auto; /* Enable vertical scrolling for the menu */
-        max-height: 100vh; /* Set the maximum height for the menu */
+        overflow-y: auto;
+        /* Enable vertical scrolling for the menu */
+        max-height: 100vh;
+        /* Set the maximum height for the menu */
         position: absolute;
         right: 0px;
         z-index: 1;
@@ -113,11 +119,13 @@ button:hover {
         border-bottom-left-radius: 50%;
         background: linear-gradient(to bottom, #0072FF, #00C6FF);
     }
+
     .navbar.responsive a:hover {
-        font-size:larger;
+        font-size: larger;
         color: white;
         background: none;
-    }    
+    }
+
     .nav-button {
         display: block;
         width: 100%;
@@ -125,8 +133,9 @@ button:hover {
         margin: 0.2em 0;
         padding: 0.5em;
     }
-    
+
 }
+
 .nav-button:before {
     content: "";
     position: absolute;
@@ -147,3 +156,8 @@ button:hover {
     left: 0;
 }
 
+.success-message {
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+}

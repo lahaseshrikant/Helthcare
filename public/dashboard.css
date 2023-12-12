@@ -28,6 +28,13 @@ form {
     border-radius: 4px;
 }
 
+form input, form textarea {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 footer {
     background-color: #333;
     color: white;
@@ -37,9 +44,4 @@ footer {
     left: 0;
     bottom: 0;
     width: 100%;
-}
-
-.change-password-button {
-    margin-top: 25em; /* Adjust as needed */
-    padding-top: 1em;
 }

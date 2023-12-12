@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 document.addEventListener('DOMContentLoaded', () => {
   // Fetch and display user information
   fetchUserData();
@@ -7,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle settings form submission
   document.getElementById('settingsForm').addEventListener('submit', (event) => {
     event.preventDefault();
-    submitHealthCheck();
     changePassword();
   });
   // Handle feedback form submission
@@ -15,7 +13,41 @@ document.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
     submitFeedback();
   });
+  // Handle settings form submission
+  document.getElementById('healthCheckForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitHealthCheck();
+  });
+  // Check if the user is logged in and adjust the UI accordingly
+  checkLoginStatus();
 });
+
+async function checkLoginStatus() {
+  try {
+    const response = await fetch('/checkLoginStatus'); // Assume an API endpoint to check login status
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const loginStatus = await response.json();
+
+    // Show or hide login/logout links based on login status
+    const loginLink = document.getElementById('loginLink');
+    const logoutLink = document.getElementById('logoutLink');
+
+    if (loginStatus.loggedIn) {
+      // User is logged in, show logout link and hide login link
+      if (logoutLink) logoutLink.style.display = 'inline-block';
+      if (loginLink) loginLink.style.display = 'none';
+    } else {
+      // User is not logged in, show login link and hide logout link
+      if (loginLink) loginLink.style.display = 'inline-block';
+      if (logoutLink) logoutLink.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Error checking login status:', error.message);
+  }
+}
 
 async function fetchUserData() {
   try {
@@ -42,19 +74,40 @@ async function changePassword() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ newPassword }),
+      body: JSON.stringify({ newPassword: newPassword }),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.message) {
+        // Password change was successful
+        console.log(data.message);
+        
+        // Update the UI to show the success message
+        const changePasswordMessage = document.getElementById('changePasswordMessage');
+        if (changePasswordMessage) {
+          changePasswordMessage.textContent = data.message;
+        } else {
+          console.error('Element with id "changePasswordMessage" not found');
+        }
+      } else {
+        console.error('Unexpected response format:', data);
+      }
+    } else {
+      // Handle different HTTP status codes
+      if (response.status === 401) {
+        console.error('Unauthorized: User not logged in');
+        // Handle unauthorized case (e.g., redirect to login)
+      } else {
+        console.error(`HTTP error! Status: ${response.status}`);
+        // Handle other cases
+      }
     }
-
-    alert('Password changed successfully!');
   } catch (error) {
     console.error('Error changing password:', error.message);
-    alert('Failed to change password. Please try again.');
   }
 }
+
 
 async function fetchRecentHealthChecks() {
   try {

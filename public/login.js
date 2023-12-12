@@ -1,10 +1,24 @@
-// public/login.js
+document.getElementById('registerLink').addEventListener('click', function(event) {
+  // Prevent the link from redirecting the user
+  event.preventDefault();
+
+  // Show the registration form
+  document.getElementById('registerFormContainer').style.display = 'block';
+
+  // Hide the login form
+  document.getElementById('loginFormContainer').style.display = 'none';
+});
+
 document.getElementById('registerForm').addEventListener('submit', function (event) {
   event.preventDefault();
   const username = document.getElementById('registerUsername').value;
   const password = document.getElementById('registerPassword').value;
-  // Save the registered user to local storage
-  localStorage.setItem('registeredUser', JSON.stringify({ username, password }));
+  // Add the new user to the registered users
+
+  registeredUsers.push({ username: username, password: password });
+
+  // Store the updated registered users in local storage
+  localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
   // Show the login form and hide the registration form
   document.getElementById('loginFormContainer').style.display = 'block';
   document.getElementById('registerFormContainer').style.display = 'none';
@@ -20,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const username = document.getElementById('registerUsername').value;
     const password = document.getElementById('registerPassword').value;
 
-    fetch('./register', {
+    fetch('/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -45,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
 
-    fetch('./login', {
+    fetch('/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
