@@ -13,9 +13,10 @@ document.getElementById('registerForm').addEventListener('submit', function (eve
   event.preventDefault();
   const username = document.getElementById('registerUsername').value;
   const password = document.getElementById('registerPassword').value;
+  const email = document.getElementById('registerEmail').value;
   // Add the new user to the registered users
 
-  registeredUsers.push({ username: username, password: password });
+  registeredUsers.push({ username: username, password: password, email: email });
 
   // Store the updated registered users in local storage
   localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
@@ -33,13 +34,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const username = document.getElementById('registerUsername').value;
     const password = document.getElementById('registerPassword').value;
+    const email = document.getElementById('registerEmail').value;
 
     fetch('/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, email }),
     })
       .then(response => response.json())
       .then(data => {

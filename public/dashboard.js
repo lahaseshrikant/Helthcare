@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
   // Fetch and display user information
   fetchUserData();
@@ -24,25 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function checkLoginStatus() {
   try {
-    const response = await fetch('/checkLoginStatus'); // Assume an API endpoint to check login status
+    const response = await fetch('/checkLoginStatus');
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const loginStatus = await response.json();
-
-    // Show or hide login/logout links based on login status
     const loginLink = document.getElementById('loginLink');
     const logoutLink = document.getElementById('logoutLink');
 
     if (loginStatus.loggedIn) {
-      // User is logged in, show logout link and hide login link
-      if (logoutLink) logoutLink.style.display = 'inline-block';
-      if (loginLink) loginLink.style.display = 'none';
+      if (loginLink) loginLink.classList.remove('visible');
+      if (logoutLink) logoutLink.classList.add('visible');
     } else {
-      // User is not logged in, show login link and hide logout link
-      if (loginLink) loginLink.style.display = 'inline-block';
-      if (logoutLink) logoutLink.style.display = 'none';
+      if (loginLink) loginLink.classList.add('visible');
+      if (logoutLink) logoutLink.classList.remove('visible');
     }
   } catch (error) {
     console.error('Error checking login status:', error.message);
@@ -51,7 +48,7 @@ async function checkLoginStatus() {
 
 async function fetchUserData() {
   try {
-    const response = await fetch('/api/user'); // Assume an API endpoint to get user data
+    const response = await fetch('/api/user');
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
@@ -82,7 +79,7 @@ async function changePassword() {
       if (data.message) {
         // Password change was successful
         console.log(data.message);
-        
+
         // Update the UI to show the success message
         const changePasswordMessage = document.getElementById('changePasswordMessage');
         if (changePasswordMessage) {
@@ -111,7 +108,7 @@ async function changePassword() {
 
 async function fetchRecentHealthChecks() {
   try {
-    const response = await fetch('/api/recentHealthChecks'); // Assume an API endpoint to get recent health checks
+    const response = await fetch('/api/recentHealthChecks'); // An API endpoint to get recent health checks
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }

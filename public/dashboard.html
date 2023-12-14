@@ -1,3 +1,9 @@
+<!--
+  Author: Shrikant Lahase
+  Date: 09/12/2023
+  Version: 1.0
+  Purpose: This page is the dashboard page for the user. It displays the user's profile information, allows the user to submit a health check, and allows the user to change their password.
+-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,25 +11,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css">
-  <script src="dashboard.js"></script>
-
   <link rel="stylesheet" href="styleindex.css">
+  <link rel="stylesheet" href="dashboard.css">
 </head>
 
 <body>
   <header>
     <h1>Welcome to Your Dashboard</h1>
   </header>
-  <nav style="margin-bottom: 20px;" class="navbar">
-    <a href="conditions.html" id="conditionsLink" class="nav-button">Conditions</a>
+  <nav style="margin-bottom: 20px;" class="navbar" id="navbar">
     <a href="index.html" id="indexLink" class="nav-button">Home</a>
+    <a href="conditions.html" id="conditionsLink" class="nav-button">Conditions</a>
     <a href="healthChecks.html" id="healthChecksLink" class="nav-button">Health Checks</a>
-    <!-- Add an ID to the login link for easier access in JavaScript -->
-    <a href="login.html" id="loginLink" class="nav-button" style="display: none;">Login</a>
-
-    <!-- Add an ID to the logout link for easier access in JavaScript -->
-    <a href="/logout" id="logoutLink" class="nav-button" style="display: none;">Logout</a>
+    <a href="login.html" id="loginLink" class="nav-button">Login</a>
+    <a href="/logout" id="logoutLink" class="nav-button">Logout</a>
     <a href="javascript:void(0);" class="icon" id="navbarButton" onclick="myFunction1()">&#9776;</a>
   </nav>
 
@@ -75,7 +76,7 @@
     <p>&copy; 2023 Health Check</p>
   </footer>
 
-
+  <script src="dashboard.js"></script>
   <script src="scriptCommon.js"></script>
 </body>
 

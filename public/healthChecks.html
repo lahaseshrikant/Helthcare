@@ -1,3 +1,10 @@
+<!--
+  Author: Shrikant Lahase
+  Date: 09/12/2023
+  Version: 1.0
+  Purpose: It contains the health checks of the user. It fetches the health checks from the server and displays them on the page.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,35 +13,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Health Checks</title>
   <link rel="stylesheet" href="styleindex.css">
-  <style>
-    /* Add your CSS styles here */
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    #healthCheckList {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    #healthCheckList li {
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 20px;
-      margin-bottom: 10px;
-    }
-  </style>
 </head>
 
 <body>
   <h1>Health Checks</h1>
-  <a href="index.html" id="homeLink" class="nav-button">Home</a>
-  <a href="logout" id="logoutLink" class="nav-button">Logout</a>
+  <nav style="margin-bottom: 20px;" class="navbar" id="navbar">
+    <a href="index.html" id="indexLink" class="nav-button">Home</a>
+    <a href="conditions.html" id="conditionsLink" class="nav-button">Conditions</a>
+    <a href="dashboard.html" id="dashboardLink" class="nav-button">Dashboard</a>
+    <a href="login.html" id="loginLink" class="nav-button">Login</a>
+    <a href="/logout" id="logoutLink" class="nav-button">Logout</a>
+    <a href="javascript:void(0);" class="icon" id="navbarButton" onclick="myFunction1()">&#9776;</a>
+  </nav>
+
   <ul id="healthCheckList"></ul>
 
   <script>
@@ -62,6 +53,7 @@
   </script>
   <!-- Include the script.js file -->
   <script src="script.js"></script>
+  <script src="scriptCommon.js"></script>
 </body>
 
 </html>

@@ -21,12 +21,12 @@ app.use(express.json());
 
 // Create a table for storing health check data
 db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS health_checks (id INTEGER, symptoms TEXT, conditions TEXT)');
+  db.run('CREATE TABLE IF NOT EXISTS health_checks (id INTEGER, symptoms TEXT, conditions TEXT, time NUMERIC)');
 });
 
 // Create a table for storing user data
 db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)');
+  db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT, email TEXT)');
 });
 
 // Create a table for storing feedback data
@@ -102,10 +102,10 @@ passport.deserializeUser((id, done) => {
 
 // Registration endpoint
 app.post('/register', (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, email } = req.body;
 
   // Check if username or password is missing
-  if (!username || !password) {
+  if (!username || !password || !email) {
     return res.status(400).json({ error: 'Username and password are required' });
   }
 
@@ -126,7 +126,7 @@ app.post('/register', (req, res) => {
       }
 
       // Insert the new user into the database
-      db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (err) => {
+      db.run('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, hashedPassword, email], (err) => {
         if (err) {
           return res.status(500).json({ error: 'Internal Server Error' });
         }
@@ -205,6 +205,7 @@ app.get('/checkHealth', (req, res) => {
 app.post('/checkHealth', (req, res) => {
   const userId = req.user.id; // Assuming user information is stored in req.user
   const symptoms = req.body.symptoms || [];
+  const currentTime = new Date().toISOString(); // Get the current time in ISO format
 
   // Check if symptoms is an array and is not empty
   if (!Array.isArray(symptoms) || symptoms.length === 0) {
@@ -216,7 +217,7 @@ app.post('/checkHealth', (req, res) => {
 
   try {
     // Store health check data in the database, associating it with the logged-in user
-    db.run('INSERT INTO health_checks (id, symptoms, conditions) VALUES (?, ?, ?)', [userId, symptoms.join(', '), conditions]);
+    db.run('INSERT INTO health_checks (id, symptoms, conditions, time) VALUES (?, ?, ?, ?)', [userId, symptoms.join(', '), conditions, currentTime]);
 
     res.json({
       suggestedConditions: conditions,
@@ -370,13 +371,14 @@ app.get('/conditions/:conditionId', (req, res) => {
   }
 });
 
-// new endpoint to retrieve recent health checks
+// new endpoint to retrieve recent health checks of the logged-in user
 app.get('/api/recentHealthChecks', (req, res) => {
-  
-  const selectQuery = 'SELECT * FROM health_checks ORDER BY id DESC LIMIT 5';
+  const userId = req.user.id; // Assuming user information is stored in req.user
 
-  // a database query to retrieve recent health checks
-  db.all(selectQuery, (error, rows) => {
+  const selectQuery = 'SELECT * FROM health_checks WHERE id = ? ORDER BY time DESC LIMIT 5';
+
+  // a database query to retrieve recent health checks of the logged-in user
+  db.all(selectQuery, [userId], (error, rows) => {
     if (error) {
       console.error('Error retrieving recent health checks:', error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -390,6 +392,7 @@ app.get('/api/recentHealthChecks', (req, res) => {
 app.post('/api/submitHealthCheck', (req, res) => {
   const userId = req.user.id; // Assuming user information is stored in req.user
   const symptoms = req.body.symptoms || [];
+  const currentTime = new Date().toISOString(); // Get the current time in ISO format
 
   // Check if symptoms is an array and is not empty
   if (!Array.isArray(symptoms) || symptoms.length === 0) {
@@ -400,8 +403,8 @@ app.post('/api/submitHealthCheck', (req, res) => {
   const conditions = suggestedConditions.join(', ');
 
   // table named 'health_checks'
-  const insertQuery = 'INSERT INTO health_checks (id, symptoms, conditions) VALUES (?, ?, ?)';
-  db.run(insertQuery, [userId, symptoms.join(', '), conditions],(error) => {
+  const insertQuery = 'INSERT INTO health_checks (id, symptoms, conditions, time) VALUES (?, ?, ?, ?)';
+  db.run(insertQuery, [userId, symptoms.join(', '), conditions, currentTime],(error) => {
     if (error) {
       console.error('Error storing health check:', error);
       res.status(500).json({ error: 'Internal Server Error' });
