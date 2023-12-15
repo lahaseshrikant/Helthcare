@@ -191,9 +191,9 @@ app.get('/secureRoute', ensureAuthenticated, (req, res) => {
   res.send(`Welcome, ${req.user.username}! This is a secure route. <a href="/logout">Logout</a>`);
 });
 
-// Welcome route
+// Redirect to index.html
 app.get('/', (req, res) => {
-  res.send('Welcome to HealthCheck!');
+  res.redirect('/index.html');
 });
 
 app.get('/checkHealth', (req, res) => {
@@ -243,6 +243,9 @@ app.use(express.static('public'));
 
 // Get all health checks from the database
 app.get('/healthChecks', (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'User not authenticated' });
+  }
   const userId = req.user.id; // Assuming user information is stored in req.user
 
   // Fetch health checks only for the logged-in user
