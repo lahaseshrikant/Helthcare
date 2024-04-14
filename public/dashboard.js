@@ -1,25 +1,21 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Fetch and display user information
   fetchUserData();
   fetchRecentHealthChecks();
 
-  // Handle settings form submission
   document.getElementById('settingsForm').addEventListener('submit', (event) => {
     event.preventDefault();
     changePassword();
   });
-  // Handle feedback form submission
   document.getElementById('feedbackForm').addEventListener('submit', (event) => {
     event.preventDefault();
     submitFeedback();
   });
-  // Handle settings form submission
+
   document.getElementById('healthCheckForm').addEventListener('submit', (event) => {
     event.preventDefault();
     submitHealthCheck();
   });
-  // Check if the user is logged in and adjust the UI accordingly
   checkLoginStatus();
 });
 
@@ -56,7 +52,6 @@ async function fetchUserData() {
     const userData = await response.json();
     document.getElementById('username').innerText = userData.username;
     document.getElementById('email').innerText = userData.email;
-    // Update other profile information as needed
   } catch (error) {
     console.error('Error fetching user data:', error.message);
   }
@@ -77,10 +72,8 @@ async function changePassword() {
     if (response.ok) {
       const data = await response.json();
       if (data.message) {
-        // Password change was successful
         console.log(data.message);
 
-        // Update the UI to show the success message
         const changePasswordMessage = document.getElementById('changePasswordMessage');
         if (changePasswordMessage) {
           changePasswordMessage.textContent = data.message;
@@ -91,13 +84,10 @@ async function changePassword() {
         console.error('Unexpected response format:', data);
       }
     } else {
-      // Handle different HTTP status codes
       if (response.status === 401) {
         console.error('Unauthorized: User not logged in');
-        // Handle unauthorized case (e.g., redirect to login)
       } else {
         console.error(`HTTP error! Status: ${response.status}`);
-        // Handle other cases
       }
     }
   } catch (error) {
@@ -108,14 +98,14 @@ async function changePassword() {
 
 async function fetchRecentHealthChecks() {
   try {
-    const response = await fetch('/api/recentHealthChecks'); // An API endpoint to get recent health checks
+    const response = await fetch('/api/recentHealthChecks');
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const healthChecks = await response.json();
     const healthCheckList = document.getElementById('healthCheckList');
-    healthCheckList.innerHTML = ''; // Clear previous list
+    healthCheckList.innerHTML = '';
 
     healthChecks.forEach((healthCheck) => {
       const listItem = document.createElement('li');
@@ -144,7 +134,6 @@ async function submitHealthCheck() {
     }
 
     alert('Health check submitted successfully!');
-    // Fetch and display updated recent health checks
     fetchRecentHealthChecks();
   } catch (error) {
     console.error('Error submitting health check:', error.message);

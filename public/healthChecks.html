@@ -25,11 +25,9 @@
     <a href="/logout" id="logoutLink" class="nav-button">Logout</a>
     <a href="javascript:void(0);" class="icon" id="navbarButton" onclick="myFunction1()">&#9776;</a>
   </nav>
-
   <ul id="healthCheckList"></ul>
 
   <script>
-    // Fetch the health checks from the backend
     fetch('http://localhost:3000/healthChecks')
       .then(response => {
         if (!response.ok) {
@@ -38,11 +36,9 @@
         return response.json();
       })
       .then(healthChecks => {
-        console.log(healthChecks); // Log the response for debugging
-        // Get the healthCheckList ul
+        console.log(healthChecks); 
         const healthCheckList = document.getElementById('healthCheckList');
 
-        // Add each health check to the ul
         healthChecks.forEach(healthCheck => {
           const li = document.createElement('li');
           li.textContent = `Symptoms: ${healthCheck.symptoms}, Conditions: ${healthCheck.conditions}`;
@@ -51,7 +47,6 @@
       })
       .catch(error => console.error('Error:', error));
   </script>
-  <!-- Include the script.js file -->
   <script src="script.js"></script>
   <script src="scriptCommon.js"></script>
 </body>

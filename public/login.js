@@ -1,11 +1,8 @@
 document.getElementById('registerLink').addEventListener('click', function(event) {
-  // Prevent the link from redirecting the user
   event.preventDefault();
 
-  // Show the registration form
   document.getElementById('registerFormContainer').style.display = 'block';
 
-  // Hide the login form
   document.getElementById('loginFormContainer').style.display = 'none';
 });
 
@@ -14,13 +11,10 @@ document.getElementById('registerForm').addEventListener('submit', function (eve
   const username = document.getElementById('registerUsername').value;
   const password = document.getElementById('registerPassword').value;
   const email = document.getElementById('registerEmail').value;
-  // Add the new user to the registered users
 
   registeredUsers.push({ username: username, password: password, email: email });
 
-  // Store the updated registered users in local storage
   localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-  // Show the login form and hide the registration form
   document.getElementById('loginFormContainer').style.display = 'block';
   document.getElementById('registerFormContainer').style.display = 'none';
 });
@@ -76,10 +70,8 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(data => {
         if (data.success) {
-          // If login is successful, redirect to dashboard
           window.location.href = '/dashboard';
         } else {
-          // If login is not successful, show an error message
           alert(data.message);
         }
       })

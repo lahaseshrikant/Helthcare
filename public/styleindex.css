@@ -63,11 +63,9 @@ button:hover {
     border-collapse: collapse;
 }
 
-/* Style for the navigation bar */
 .navbar {
     display: flex;
     justify-content: flex-end;
-    /* Align links to the right */
     align-items: center;
     overflow: hidden;
     padding: 0px;
@@ -107,7 +105,6 @@ button:hover {
     z-index: -1;
 }
 
-/* Responsive navigation menu */
 .navbar .icon {
     display: none;
 }
@@ -129,14 +126,12 @@ button:hover {
         left: 0;
     }
 
-    /* Hide the login and logout buttons by default on small screens */
     #loginLink,
     #logoutLink,
     #dashboardLink {
         display: none;
     }
 
-    /* Show the appropriate button when the menu is opened */
     #loginLink.visible,
     #logoutLink.visible,
     #dashboardLink.visible {
@@ -147,15 +142,12 @@ button:hover {
 
 
 @media screen and (max-width: 600px) {
-
-    /* Hide the login and logout buttons by default on small screens */
     #loginLink,
     #logoutLink,
     #dashboardLink {
         display: none;
     }
 
-    /* Show the appropriate button when the menu is opened */
     .navbar.responsive #loginLink.visible,
     .navbar.responsive #logoutLink.visible,
     .navbar.responsive #dashboardLink.visible {
@@ -170,7 +162,6 @@ button:hover {
     .navbar .icon {
         display: block;
         order: -1;
-        /* Place the icon at the top on small screens */
     }
 
     .navbar a:not(:last-child) {
@@ -189,9 +180,7 @@ button:hover {
 
     .navbar.responsive {
         overflow-y: auto;
-        /* Enable vertical scrolling for the menu */
         max-height: 100vh;
-        /* Set the maximum height for the menu */
         position: absolute;
         right: 0px;
         z-index: 1;
@@ -215,7 +204,6 @@ button:hover {
 }
 
 
-/* style for health check page */
 #healthCheckList {
     list-style-type: none;
     padding: 0;

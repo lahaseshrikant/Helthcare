@@ -63,30 +63,24 @@
   <h1>Health Condition Details</h1>
 
   <div id="conditionDetails">
-    <!-- Condition details will be displayed here -->
+
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Get the condition ID from the URL
       const conditionId = window.location.pathname.split('/').pop();
-
-      // Fetch condition details from the server
       fetch(`/conditions/${conditionId}`)
         .then(response => response.json())
         .then(data => console.log(data))
         .catch(error => console.error('Error:', error));
-
     });
 
     function displayConditionDetails(data) {
       const conditionDetailsContainer = document.getElementById('conditionDetails');
 
       if (data.error) {
-        // Display an error message if condition details are not available
         conditionDetailsContainer.innerHTML = `<p>${data.error}</p>`;
       } else {
-        // Display condition details
         const conditionId = data.conditionId;
         const conditionDetails = data.conditionDetails;
 

@@ -38,13 +38,10 @@
   </div>
 
   <script>
-    // Get registered users from local storage
   const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
     if (registeredUsers.length > 0) {
-      // If there are any registered users, hide the registration form
       document.getElementById('registerFormContainer').style.display = 'none';
     } else {
-      // If there are no registered users, hide the login form
       document.getElementById('loginFormContainer').style.display = 'none';
     }
   </script>
